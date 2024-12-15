@@ -20,6 +20,7 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
     console.log('randArr is', randomNumbersArr);
   }
 
+  // TO DO: Shuffle the random numbers
   return (
     <View style={styles.container}>
       <Pressable  onPress={refreshTarget}>
@@ -48,7 +49,8 @@ const styles = StyleSheet.create({
       fontSize: 30,
       backgroundColor:"#aaa",
       textAlign:"center",
-      marginHorizontal: 20
+      marginHorizontal: 20,
+      marginTop:20
     },
     randomContainer:{
       flexDirection:"row", 
@@ -57,13 +59,12 @@ const styles = StyleSheet.create({
       justifyContent:"space-around"
     },
     randomNumber:{
-
       fontSize:24,
       width:150,
       backgroundColor:"#999",
-      // marginTop:10,
       marginHorizontal:15,
-      marginVertical: 15
+      marginVertical: 15,
+      textAlign:"center"
     }
 })
 
