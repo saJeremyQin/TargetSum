@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect } from 'react'
 import { useState } from 'react'
+import RandomNumber from './RandomNumber'
 
 // Define the type of Props
 interface GameProps {
@@ -28,7 +29,8 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
         <View style={styles.randomContainer}>
         {
           randomNumbersArr.map((randomNumber, index) => 
-            <Text key={index} style={styles.randomNumber}>{randomNumber}</Text>
+            // <Text key={index} style={styles.randomNumber}>{randomNumber}</Text>
+            <RandomNumber key={index} number={randomNumber} />
           )
         }
         </View>  
@@ -61,11 +63,11 @@ const styles = StyleSheet.create({
     randomNumber:{
       fontSize:24,
       width:150,
-      backgroundColor:"#999",
+      backgroundColor:"#3c9",
       marginHorizontal:15,
       marginVertical: 15,
       textAlign:"center"
-    }
+  }  
 })
 
 export default Game;
