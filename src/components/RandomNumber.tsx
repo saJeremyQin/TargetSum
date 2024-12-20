@@ -2,18 +2,24 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
 interface RandomNumberProps {
+    id: number,
     number: number,
+    isDisabled: boolean,
+    onClick: Function,
     backgroundColor?:string;
 }
 
 // export default function RandomNumber({number}: RandomNumberProps): React.JSX.Element {
-const RandomNumber: React.FC<RandomNumberProps> = ({number, backgroundColor="#3c9"}) => {
+const RandomNumber: React.FC<RandomNumberProps> = ({id, number, isDisabled, onClick, backgroundColor="#3c9"}) => {
     const handlePress = () =>{
-        console.log(`${number} is clicked`);
+        if(!isDisabled) {
+            console.log(`${number} is clicked,`+`its index is ${id}`);            
+            onClick(id);  
+        }
     }
     return (
         <Pressable onPress={handlePress} style={styles.pressable}>
-            <Text style={[styles.numberBox, {backgroundColor}]}>{number}</Text>
+            <Text style={[styles.numberBox, {backgroundColor, opacity: isDisabled ? 0.5:1}]}>{number}</Text>
         </Pressable>   
     )    
 }
