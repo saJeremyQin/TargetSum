@@ -13,41 +13,45 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
   const [randomNumbersArr, setRandomNumbersArr] = useState<number[]>([]);
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
 
-   // 生成随机数数组的函数
+  // Function: Generate random numbers
   const generateRandomNumbers = (): number[] => {
     return Array.from({ length: randomNumbersCount }, () => 1 + Math.floor(10 * Math.random()));
   };
 
+  // Only invoke once when initialize, to set random numbers array
   useEffect(() => {
     const numbers = generateRandomNumbers();
     setRandomNumbersArr(numbers);
   }, []);
 
-
+  // Sum random numbers to generate target
   const target = randomNumbersArr.length > 0
     ? randomNumbersArr.slice(0, randomNumbersCount-2).reduce((acc, cur) => acc+cur, 0)
     : 0;
 
+  // Refresh random numbers array
   const refreshTarget = (): void => {
-    console.log("It is", randomNumbersCount);
-    console.log('randArr is', randomNumbersArr);
     const numbers = generateRandomNumbers();
     setRandomNumbersArr(numbers);
     setSelectedNumbers([]);
   }
 
+  // When RandomNumber is clicked, selectNumber of Game, which is the parent component of RandomNumber, will be invoked.
   const selectNumber = (index:number): void => {
-    console.log('selectedNumber index is %d', index);
+    // console.log('selectedNumber index is %d', index);
+
     if(!selectedNumbers.includes(index)) {
       setSelectedNumbers((prevSelectedNumbers) => [...prevSelectedNumbers, index]);
     }
   }
 
+  // Check whehter the number is Disabled or not.
   const isNumberSelected = (index:number): boolean => {
     return selectedNumbers.indexOf(index) !== -1;
   }
 
   // TO DO: Shuffle the random numbers
+
   return (
     <View style={styles.container}>
       <Pressable  onPress={refreshTarget}>
@@ -56,7 +60,6 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
       <View style={styles.randomContainer}>
       {
         randomNumbersArr.map((randomNumber, index) => 
-          // <Text key={index} style={styles.randomNumber}>{randomNumber}</Text>
           <RandomNumber 
             key={index} 
             id={index}

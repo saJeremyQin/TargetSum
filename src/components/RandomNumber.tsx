@@ -19,7 +19,7 @@ const RandomNumber: React.FC<RandomNumberProps> = ({id, number, isDisabled, onCl
     }
     return (
         <Pressable onPress={handlePress} style={styles.pressable}>
-            <Text style={[styles.numberBox, {backgroundColor, opacity: isDisabled ? 0.5:1}]}>{number}</Text>
+            <Text style={[styles.numberBox, {backgroundColor}, isDisabled && styles.disabled]}>{number}</Text>
         </Pressable>   
     )    
 }
@@ -34,7 +34,10 @@ const styles = StyleSheet.create({
         height:50,              //When <Text> is nested in <Pressable>, need clear size to paint it.
         textAlign:"center",
         paddingVertical:10,
-    }  
+    },
+    disabled: {
+        opacity: 0.5
+    }
 })
 
 export default RandomNumber;
