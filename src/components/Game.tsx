@@ -78,7 +78,7 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
             key={index} 
             id={index}
             number={randomNumber} 
-            isDisabled = {isNumberSelected(index)}
+            isDisabled = {isNumberSelected(index) || gameStatus()!=='Playing'}
             onClick={()=> selectNumber(index)}
           />
         )
