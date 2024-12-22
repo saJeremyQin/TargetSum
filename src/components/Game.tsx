@@ -11,7 +11,7 @@ interface GameProps {
 // export default function Game({title} : GameProps):  React.JSX.Element{
 const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
   const [randomNumbersArr, setRandomNumbersArr] = useState<number[]>([]);
-  const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   // Function: Generate random numbers
   const generateRandomNumbers = (): number[] => {
@@ -33,29 +33,43 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
   const refreshTarget = (): void => {
     const numbers = generateRandomNumbers();
     setRandomNumbersArr(numbers);
-    setSelectedNumbers([]);
+    setSelectedIds([]);
   }
 
   // When RandomNumber is clicked, selectNumber of Game, which is the parent component of RandomNumber, will be invoked.
   const selectNumber = (index:number): void => {
     // console.log('selectedNumber index is %d', index);
 
-    if(!selectedNumbers.includes(index)) {
-      setSelectedNumbers((prevSelectedNumbers) => [...prevSelectedNumbers, index]);
+    if(!selectedIds.includes(index)) {
+      setSelectedIds((prevSelectedIds) => [...prevSelectedIds, index]);
     }
+  }
+
+  // gameStatus: Playing, Won, Lost
+  const gameStatus = () : GameStatus => {
+    const sumSelcted = selectedIds.reduce((acc, cur) => acc+randomNumbersArr[cur], 0);
+    if(sumSelcted > target)
+       return 'Lost';
+    else if(sumSelcted === target) 
+       return 'Won';
+    else
+       return 'Playing';       
   }
 
   // Check whehter the number is Disabled or not.
   const isNumberSelected = (index:number): boolean => {
-    return selectedNumbers.indexOf(index) !== -1;
+    return selectedIds.indexOf(index) !== -1;
   }
 
   // TO DO: Shuffle the random numbers
 
+  // const gameStatus = gameStatus();
   return (
     <View style={styles.container}>
       <Pressable  onPress={refreshTarget}>
-        <Text style={styles.target}>{target}</Text>
+        <Text style={[styles.target, styles[`STATUS_${gameStatus() as GameStatus}`]]}>
+          {target}
+        </Text>
       </Pressable>
       <View style={styles.randomContainer}>
       {
@@ -70,6 +84,7 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
         )
       }
       </View>  
+      <Text style={styles.status}>{gameStatus()}</Text>
     </View>
   )
 }
@@ -79,7 +94,8 @@ const styles = StyleSheet.create({
     container:{
       backgroundColor:"#ddd",
       flex: 1,
-      paddingTop:50
+      paddingTop:50,
+      // justifyContent: "space-evenly"
     },
     target:{
       fontWeight:"700",
@@ -87,9 +103,10 @@ const styles = StyleSheet.create({
       backgroundColor:"#aaa",
       textAlign:"center",
       marginHorizontal: 20,
-      marginTop:20
+      marginTop:50,
     },
     randomContainer:{
+      marginTop:30,
       flexDirection:"row", 
       flex:1,
       flexWrap:"wrap",
@@ -102,7 +119,24 @@ const styles = StyleSheet.create({
       marginHorizontal:15,
       marginVertical: 15,
       textAlign:"center"
-  }  
+    },
+    status: {
+      textAlign:"center",
+      fontSize:32,
+      flexGrow:0.25
+    },
+    STATUS_Playing: {
+      backgroundColor: "gray",
+    },
+    STATUS_Won: {
+      backgroundColor: "green",
+    },
+    STATUS_Lost: {
+      backgroundColor: "red",
+    },
 })
+
+type GameStatus = "Playing" | "Won" | "Lost";
+
 
 export default Game;
