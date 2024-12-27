@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { useState } from 'react'
 import RandomNumber from './RandomNumber'
 
@@ -41,7 +41,6 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
   useEffect(() => {
     const numbers = generateRandomNumbers();
     setRandomNumbersArr(numbers);
-    startTimer();
 
     // when component unmount, clear the timer
     return () => {
@@ -52,10 +51,16 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
     }
   }, []);
 
+  // after randomNumbersArray is set up, start timer
+  useEffect(() => {
+    if(randomNumbersArr.length > 0) 
+      startTimer();
+  },[randomNumbersArr])
+
   // Sum random numbers to generate target
-  const target = randomNumbersArr.length > 0
-    ? randomNumbersArr.slice(0, randomNumbersCount-2).reduce((acc, cur) => acc+cur, 0)
-    : 0;
+  const target = useMemo(() => {
+    return randomNumbersArr.length > 0 ? randomNumbersArr.slice(0, randomNumbersCount-2).reduce((acc, cur) => acc+cur, 0) : 0;
+  },[randomNumbersArr]);
 
   // Refresh random numbers array
   const refreshTarget = (): void => {
@@ -76,7 +81,7 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
   }
 
   // gameStatus: Playing, Won, Lost
-  const gameStatus = () : GameStatus => {
+  const gameStatus = useMemo(() : GameStatus => {
     const sumSelcted = selectedIds.reduce((acc, cur) => acc+randomNumbersArr[cur], 0);
     if(remainingSeconds === 0) 
       return 'Lost';
@@ -86,7 +91,16 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
        return 'Won';
     else
        return 'Playing';       
-  }
+  },[randomNumbersArr, selectedIds, remainingSeconds]);
+
+  useEffect(() => {
+    if(gameStatus!== 'Playing') {
+      if(timerId.current) {
+        clearInterval(timerId.current);
+        timerId.current =null
+      }
+    }
+  }, [gameStatus]);
 
   // Check whehter the number is Disabled or not.
   const isNumberSelected = (index:number): boolean => {
@@ -99,7 +113,7 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
   return (
     <View style={styles.container}>
       <Pressable  onPress={refreshTarget}>
-        <Text style={[styles.target, styles[`STATUS_${gameStatus() as GameStatus}`]]}>
+        <Text style={[styles.target, styles[`STATUS_${gameStatus as GameStatus}`]]}>
           {target}
         </Text>
       </Pressable>
@@ -110,13 +124,13 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
             key={index} 
             id={index}
             number={randomNumber} 
-            isDisabled = {isNumberSelected(index) || gameStatus()!=='Playing'}
+            isDisabled = {isNumberSelected(index) || gameStatus!=='Playing'}
             onClick={()=> selectNumber(index)}
           />
         )
       }
       </View>  
-      <Text style={styles.status}>{gameStatus()}</Text>
+      <Text style={styles.status}>{gameStatus}</Text>
       <Text style={styles.timer}>{remainingSeconds}</Text>
     </View>
   )
