@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useState } from 'react'
 import RandomNumber from './RandomNumber'
 
@@ -12,16 +12,44 @@ interface GameProps {
 const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
   const [randomNumbersArr, setRandomNumbersArr] = useState<number[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [remainingSeconds, setRemainingSeconds] = useState<number>(10);
+  const timerId = useRef<NodeJS.Timeout | null>(null);
 
   // Function: Generate random numbers
   const generateRandomNumbers = (): number[] => {
     return Array.from({ length: randomNumbersCount }, () => 1 + Math.floor(10 * Math.random()));
   };
 
+  const startTimer = (): void => {
+    // clear existing if it has
+    if (timerId.current) {
+      clearInterval(timerId.current);
+      timerId.current = null;
+    }
+  
+    // reset the remaining seconds
+    setRemainingSeconds(10);
+  
+    // restart a new timer
+    timerId.current = setInterval(() => {
+      setRemainingSeconds((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+  };
+  
   // Only invoke once when initialize, to set random numbers array
+  // start Timer as well
   useEffect(() => {
     const numbers = generateRandomNumbers();
     setRandomNumbersArr(numbers);
+    startTimer();
+
+    // when component unmount, clear the timer
+    return () => {
+      if(timerId.current) {
+        clearInterval(timerId.current);
+        timerId.current=null;
+      }
+    }
   }, []);
 
   // Sum random numbers to generate target
@@ -34,6 +62,7 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
     const numbers = generateRandomNumbers();
     setRandomNumbersArr(numbers);
     setSelectedIds([]);
+    startTimer();
   }
 
   // When RandomNumber is clicked, selectNumber of Game, which is the parent component of RandomNumber, will be invoked.
@@ -43,11 +72,14 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
     if(!selectedIds.includes(index)) {
       setSelectedIds((prevSelectedIds) => [...prevSelectedIds, index]);
     }
+    startTimer();
   }
 
   // gameStatus: Playing, Won, Lost
   const gameStatus = () : GameStatus => {
     const sumSelcted = selectedIds.reduce((acc, cur) => acc+randomNumbersArr[cur], 0);
+    if(remainingSeconds === 0) 
+      return 'Lost';
     if(sumSelcted > target)
        return 'Lost';
     else if(sumSelcted === target) 
@@ -85,6 +117,7 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
       }
       </View>  
       <Text style={styles.status}>{gameStatus()}</Text>
+      <Text style={styles.timer}>{remainingSeconds}</Text>
     </View>
   )
 }
@@ -122,8 +155,8 @@ const styles = StyleSheet.create({
     },
     status: {
       textAlign:"center",
-      fontSize:32,
-      flexGrow:0.25
+      fontSize:28,
+      flexGrow:0.15
     },
     STATUS_Playing: {
       backgroundColor: "gray",
@@ -134,9 +167,13 @@ const styles = StyleSheet.create({
     STATUS_Lost: {
       backgroundColor: "red",
     },
+    timer: {
+      textAlign:"center",
+      fontSize:28,
+      flexGrow:0.15
+    }
 })
 
 type GameStatus = "Playing" | "Won" | "Lost";
-
 
 export default Game;
