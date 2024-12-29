@@ -20,13 +20,21 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
     return Array.from({ length: randomNumbersCount }, () => 1 + Math.floor(10 * Math.random()));
   };
 
-  const startTimer = (): void => {
-    // clear existing if it has
+  // Clear timer
+  const clearTimer = () : void => {
     if (timerId.current) {
       clearInterval(timerId.current);
       timerId.current = null;
     }
-  
+  }
+
+  const startTimer = (): void => {
+    // // clear existing if it has
+    // if (timerId.current) {
+    //   clearInterval(timerId.current);
+    //   timerId.current = null;
+    // }
+    clearTimer();
     // reset the remaining seconds
     setRemainingSeconds(10);
   
@@ -36,6 +44,7 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
     }, 1000);
   };
   
+
   // Only invoke once when initialize, to set random numbers array
   // start Timer as well
   useEffect(() => {
@@ -43,12 +52,13 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
     setRandomNumbersArr(numbers);
 
     // when component unmount, clear the timer
-    return () => {
-      if(timerId.current) {
-        clearInterval(timerId.current);
-        timerId.current=null;
-      }
-    }
+    // return () => {
+    //   if(timerId.current) {
+    //     clearInterval(timerId.current);
+    //     timerId.current=null;
+    //   }
+    // }
+    return clearTimer();
   }, []);
 
   // after randomNumbersArray is set up, start timer
@@ -95,10 +105,11 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
 
   useEffect(() => {
     if(gameStatus!== 'Playing') {
-      if(timerId.current) {
-        clearInterval(timerId.current);
-        timerId.current =null
-      }
+      // if(timerId.current) {
+      //   clearInterval(timerId.current);
+      //   timerId.current =null
+      // }
+      clearTimer();
     }
   }, [gameStatus]);
 
