@@ -8,6 +8,16 @@ interface GameProps {
   randomNumbersCount: number
 }
 
+const shuffleArray = (array: number[]): number[] => {
+  const shuffledArray = [...array]; // Create a copy to avoid mutating the original array
+  for (let i = shuffledArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1)); // Random index from 0 to i
+    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]; // Swap
+  }
+  return shuffledArray;
+};
+
+
 // export default function Game({title} : GameProps):  React.JSX.Element{
 const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
   const [randomNumbersArr, setRandomNumbersArr] = useState<number[]>([]);
@@ -28,15 +38,10 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
     }
   }
 
-  const startTimer = (): void => {
-    // // clear existing if it has
-    // if (timerId.current) {
-    //   clearInterval(timerId.current);
-    //   timerId.current = null;
-    // }
+  const startTimer = (duration: number = 10): void => {
     clearTimer();
     // reset the remaining seconds
-    setRemainingSeconds(10);
+    setRemainingSeconds(duration);
   
     // restart a new timer
     timerId.current = setInterval(() => {
@@ -52,32 +57,26 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
     setRandomNumbersArr(numbers);
 
     // when component unmount, clear the timer
-    // return () => {
-    //   if(timerId.current) {
-    //     clearInterval(timerId.current);
-    //     timerId.current=null;
-    //   }
-    // }
     return clearTimer();
   }, []);
 
   // after randomNumbersArray is set up, start timer
   useEffect(() => {
     if(randomNumbersArr.length > 0) 
-      startTimer();
+      startTimer(10);
   },[randomNumbersArr])
 
   // Sum random numbers to generate target
   const target = useMemo(() => {
-    return randomNumbersArr.length > 0 ? randomNumbersArr.slice(0, randomNumbersCount-2).reduce((acc, cur) => acc+cur, 0) : 0;
+    return randomNumbersArr.length > 0 ? shuffleArray([...randomNumbersArr]).slice(0, randomNumbersCount-2).reduce((acc, cur) => acc+cur, 0) : 0;
   },[randomNumbersArr]);
-
+  
   // Refresh random numbers array
   const refreshTarget = (): void => {
     const numbers = generateRandomNumbers();
     setRandomNumbersArr(numbers);
     setSelectedIds([]);
-    startTimer();
+    startTimer(10);
   }
 
   // When RandomNumber is clicked, selectNumber of Game, which is the parent component of RandomNumber, will be invoked.
@@ -87,7 +86,7 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
     if(!selectedIds.includes(index)) {
       setSelectedIds((prevSelectedIds) => [...prevSelectedIds, index]);
     }
-    startTimer();
+    startTimer(10);
   }
 
   // gameStatus: Playing, Won, Lost
