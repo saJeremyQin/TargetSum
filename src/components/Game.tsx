@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, Text, View, Button } from 'react-native'
 import React, { useEffect, useMemo, useRef } from 'react'
 import { useState } from 'react'
 import RandomNumber from './RandomNumber'
@@ -141,7 +141,13 @@ const Game:React.FC<GameProps> = ({randomNumbersCount}) => {
       }
       </View>  
       <Text style={styles.status}>{gameStatus}</Text>
-      <Text style={styles.timer}>{remainingSeconds}</Text>
+      <View style={styles.notifyArea}>
+      {
+        gameStatus === "Playing" ? 
+        (<Text style={styles.timer}>{remainingSeconds}</Text>) : 
+        (<Button title="Play Again" color="#47a" onPress={()=> {}} />)
+      }
+      </View>
     </View>
   )
 }
@@ -195,6 +201,13 @@ const styles = StyleSheet.create({
       textAlign:"center",
       fontSize:28,
       flexGrow:0.15
+    },
+    notifyArea:{
+      flexGrow:0.15
+    },
+    playAgainBtn: {
+      // backgroundColor:"#47a",
+      // flexGrow:0.15
     }
 })
 
