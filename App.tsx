@@ -5,13 +5,23 @@
  * @format
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import Game from './src/components/Game';
 
 function App(): React.JSX.Element {
+  const [gameId, setGameId] = useState<number>(1);
+
+  const resetGame = () => {
+    setGameId((prevId)=> prevId+1);
+  }
 
   return (
-    <Game randomNumbersCount={6}></Game>
+    <Game 
+      gameKey={gameId} 
+      randomNumbersCount={6} 
+      initialSeconds={10} 
+      onPlayAgain={resetGame} 
+    />
   );
 }
 
